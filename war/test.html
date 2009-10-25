@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml"> 
+	<head> 
+		<title>GuessWhatItIs.com</title> 
+		<meta http-equiv="Content-Language" content="English" /> 
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+		<link rel="stylesheet" type="text/css" href="/style.css" media="screen" /> 
+	</head> 
+	<body> 
+		<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script> 
+ 		
+		<div id="wrap"> 
+		
+		<div id="top"></div> 
+		
+		<div id="content"> 
+		<div class="header"> 
+		<div style="text-align:left;float:left"> 
+			<h1>GuessWhatItIs?<sub>Beta</sub></h1> 
+		</div> 
+		<div style="text-align:right;"> 
+			<fb:profile-pic uid="100000289421407" size="square"  facebook-logo="true"></fb:profile-pic> 
+			<p>Welcome AmitTest Nithian</p> 
+			<a href="#" onclick="FB.Connect.logoutAndRedirect('/'); return false;">Logout</a> 
+			<script type="text/javascript">  
+				FB.init("732394fdee1cd373b6e4898bfb59c16a", "/xd_receiver.htm");
+				function facebook_onlogin(){  
+	  				FB.Connect.ifUserConnected("/guesswhat/",null);  
+				}
+			</script> 
+		</div> 
+		</div> 
+		
+		<div class="middle"> 
+	<h3>Submit your question image!</h3> 
+	<p>Use the following form to submit a question for others to guess. The first image is the one that is displayed as the quiz question
+	and should be tricky to guess. The second image is the one that is displayed on the answer page following the completion of a quiz. Enter between three
+	and four answer choices and remember, balance creativity, difficulty, and fun so choose question images and answers that are fun and make sense!
+	<br/> 
+	<b>Note:</b> It is your responsibility to make sure that the image links submitted do not violate any copyright laws. Please ensure this before
+	submitting the links!
+	</p> 
+	<table cellspacing="10"> 
+		<tr> 
+		<td> 
+		<div style="width:450px"> 
+			<form name="addQuestion" method="post" action="/guesswhat/add" onSubmit="return validateForm();"> 
+				Question Image Link: <input style="width:100%" name="questionImage" type="text" onFocus = "updateImage('questionImage',true)" onBlur="updateImage('questionImage',true)"/> 
+				<br/> 
+				Answer Image Link: <input style="width:100%" name="answerImage" type="text" onFocus="updateImage('answerImage',false)" onBlur="updateImage('answerImage',false)"/> 
+				<br/><br/> 
+				<p>Enter between three and four possible answers and denote the correct answer.</p> 
+				<input type="text" name="choice0"/> <input type="radio" name="correct" value="0" checked="checked"/> Correct
+				<br/> 
+				<input type="text" name="choice1"/> <input type="radio" name="correct" value="1"/> Correct
+				<br/> 
+				<input type="text" name="choice2"/> <input type="radio" name="correct" value="2"/> Correct
+				<br/> 
+				<input type="text" name="choice3"/> <input type="radio" name="correct" value="3"/> Correct
+				<br/> 
+				<input type="submit" value="Submit Question" id="submitQuestion" name="submitQuestion" disabled="true"/> 
+			</form>
+			</div> 
+			</td> 
+			<td> 
+			<div style="width:240px;height:180px;display:block" id="questionImageDiv"> 
+				<h4 align="center">Question Image</h4> 
+				<img id="questionImage" style="max-width: 240px;max-height: 180px" src="/images/tinyImage.jpg" onLoad="questionImageLoaded()"/> 
+			</div> 
+			</td> 
+			<td> 
+			<div style="width:240px;height:180px;display:block" id="answerImageDiv"> 
+				<h4 align="center">Answer Image</h4> 
+				<img style="max-width: 240px;max-height: 180px" id="answerImage" src="/images/tinyImage.jpg"  onLoad="answerImageLoaded()"/> 
+			</div> 
+			</td> 
+			</tr> 
+			</table> 
+			<script type="text/javascript">
+				var bQuestionImageLoaded=false;
+				var bAnswerImageLoaded=false;
+				
+				function questionImageLoaded()
+				{
+					if(document.images["questionImage"].src.indexOf("tinyImage.jpg") < 0)					
+						bQuestionImageLoaded=true;
+					if(bAnswerImageLoaded && bQuestionImageLoaded)
+					{
+						document.getElementById("submitQuestion").disabled=null;
+					}						
+				}
+				
+				function answerImageLoaded()
+				{
+					if(document.images["answerImage"].src.indexOf("tinyImage.jpg") < 0)	
+						bAnswerImageLoaded=true;
+					if(bAnswerImageLoaded && bQuestionImageLoaded)
+					{
+						document.getElementById("submitQuestion").disabled=null;
+					}				
+				}
+				
+				function updateImage(pImageName, pIsQuestion)
+				{
+					var sQuestionImage = document.forms['addQuestion'].elements[pImageName].value;
+					var sImageElement = (pIsQuestion ? "questionImage" : "answerImage");
+					var sImageDiv = (pIsQuestion ? "questionImageDiv" : "answerImageDiv");
+					document.images[sImageElement].src=sQuestionImage
+					if(sQuestionImage.length == 0)
+					{
+						bQuestionImageLoaded=false;
+						bAnswerImageLoaded=false;
+						document.getElementById("submitQuestion").disabled="true";
+						document.images[pImageName].src="/images/tinyImage.jpg";
+					}
+				}
+				
+				function validateForm()
+				{
+					//ensure that at least 3 of the 4 choices are filled in and
+					//the correct answer is not blank.
+					var questionForm = document.forms['addQuestion'];
+					var iNumEmpty = 0;
+					var sCorrectAnswer = "";
+					updateImage('questionImage',true)
+					updateImage('answerImage',false)
+					for(var i=0; i < 4; i++)
+					{
+						var sAnswer = questionForm.elements['choice'+i].value;
+						if(sAnswer.length == 0) iNumEmpty++;
+						if(questionForm.correct[i].checked)
+							sCorrectAnswer = sAnswer;
+					}
+					if(sCorrectAnswer.length == 0 || iNumEmpty > 3)
+					{
+						alert('Please enter at least 3 answers and ensure that the correct answer is not blank.'); 
+						return false;
+					}
+					if(document.getElementById("questionImage").naturalWidth ==0 
+					|| document.getElementById("answerImage").naturalWidth == 0)
+					{
+						alert('Both the question and answer images must be valid images!');
+						return false; 
+					}
+					var questionImageSize = document.getElementById("questionImage").naturalWidth * document.getElementById("questionImage").naturalHeight *3;
+					var answerImageSize= document.getElementById("answerImage").naturalWidth * document.getElementById("answerImage").naturalHeight *3;
+					if(questionImageSize > 1000000 || answerImageSize > 1000000)
+					{
+						alert('A maximum 1MB image file size is allowed to keep the quizzes fast and enjoyable. Please submit links to smaller images.');
+						return false;
+					}
+					return false;
+				}
+			</script> 
+ 
+		</div> 
+		
+		<div id="clear"></div> 
+		<div class="navigation"> 
+		<ul> 
+			<li><a href="/guesswhat">Home</a></li> 
+			<li><a href="/">About Us</a></li> 
+			<li><a href="/guesswhat/contact">Contact Us</a></li> 
+			<li><a href="/guesswhat/add">Add Picture</a></li> 
+		</ul> 
+		</div> 
+		<!--
+			<div class="header">
+				<h2>Hello</h2>
+			</div> 
+			--></div> 
+		
+		<div id="bottom"></div> 
+		
+		</div> 
+		
+		
+		<div id="footer">Design adapted from <a 
+			href="http://www.minimalistic-design.net">Minimalistic Design</a>.
+		Copyright &copy; 2009. Amit Nithian</div>	
+		
+	</body> 
+</html>

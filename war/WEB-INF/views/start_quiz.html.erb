@@ -1,0 +1,36 @@
+<div class="questionBox">
+	<img class="quizImage" src="/guesswhat/get_image/<%=@questionHash %>"/>
+	<form action="/guesswhat/start_quiz" name="quiz" method="POST">
+		<div class="answerBox">
+		<ul>
+			<%
+			@answerList.each_with_index {|val,idx|
+			%>
+				<li><input type="radio" name="choice" onclick="document.quiz.submit()" value="<%=idx%>"> <%=val%></input></li>
+			<%
+			}
+			%>
+		</ul>
+		</div>
+	</form>
+</div>
+<!--
+	<h2>What is GuessWhatItIs?</h2>
+			
+	Like the name implies, GuessWhatItIs is a simple guessing game website where people can post pictures of interesting things and other people can guess what it is! Many times, people will post on a discussion board a picture of something cool and others will respond in the comments section what they believe it is. This site is different in that your cool picture becomes a question in someone else's guessing game and the better your pictures are, the better the questions are and hence the more engaging this game is! To make this more fun, this will be integrated into Facebook as an app so that you can easily choose pictures and your friends can know how you did on your image quizzes!
+	<br /><br />
+	
+	<h2>How do I participate?</h2>
+	<h3>As a question maker (planned)</h3>
+	<ul>
+		
+		<li> Select an existing image (or upload a new image) from your Facebook albums </li>
+		<li> Create four tough possible choices for your image.</li>
+		<li> Select the correct answer </li>
+		<li> Submit the question to the question bank </li>
+	</ul>
+	<br /><br />
+	<h3>As a game player</h3>
+	Take a <a href="/guesswhat/">quiz</a>!
+	
+	-->

@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
+	<head>
+		<title>GuessWhatItIs.com</title>
+		<meta http-equiv="Content-Language" content="English" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet" type="text/css" href="/style.css" media="screen" />
+	</head>
+	<body>
+		<script src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php/en_US" type="text/javascript"></script>
+ 		
+		<div id="wrap">
+		
+		<div id="top"></div>
+		
+		<div id="content"> 
+		<div class="header">
+		<div style="text-align:left;float:left"> 
+			<h1>GuessWhatItIs?<sub>Beta</sub></h1> 
+		</div>
+		<div style="text-align:right;">
+			<%if @fbUser.nil? %>
+			<p>Welcome Guest</p>
+			<br/>
+			<fb:login-button onlogin="facebook_onlogin();"></fb:login-button>
+			<% else %>
+			<fb:profile-pic uid="<%=@fbUser.getId%>" size="square"  facebook-logo="true"></fb:profile-pic>
+			<p>Welcome <%= @fbUser.getName %></p>
+			<a href="#" onclick="FB.Connect.logoutAndRedirect('/'); return false;">Logout</a>
+			<% end %>
+			<script type="text/javascript">  
+				FB.init("732394fdee1cd373b6e4898bfb59c16a", "/xd_receiver.htm");
+				function facebook_onlogin(){  
+	  				FB.Connect.ifUserConnected("/guesswhat/",null);  
+				}
+			</script>
+		</div> 
+		</div> 
+		
+		<div class="middle">
+			<%= catch_content :for_layout %>
+		</div>
+		
+		<!--		
+			<div class="right">
+					
+			<h2>Navigation</h2>
+			
+			<ul>
+			<li><a href="http://www.minimalistic-design.net">Minimalistic Design</a></li>
+			<li><a href="http://www.oswd.org">Open Source Web Design</a></li>
+			<li><a href="http://www.opendesigns.org">Open Designs</a></li>
+			<li><a href="http://www.openwebdesign.org">Open Web Design</a></li>
+			<li><a href="http://www.iollo.com">Iollo's review highway</a></li>
+			<li><a href="http://www.historyexplorer.net">History Timelines</a></li>
+			<li><a href="http://www.quakerparrot.info">Quaker Parrot</a></li>
+			<li><a href="http://www.moneybookersclub.com">Moneybookers Club</a></li>
+			</ul>
+					
+			</div>
+			-->
+		
+		<div id="clear"></div>
+		<div class="navigation">
+		<ul>
+			<li><a href="/guesswhat">Home</a></li>
+			<li><a href="/">About Us</a></li>
+			<li><a href="/guesswhat/contact">Contact Us</a></li>
+			<li><a href="/guesswhat/add">Add Picture</a></li>
+		</ul>
+		</div>
+		<!--
+			<div class="header">
+				<h2>Hello</h2>
+			</div> 
+			--></div>
+		
+		<div id="bottom"></div>
+		
+		</div>
+		
+		
+		<div id="footer">Design adapted from <a
+			href="http://www.minimalistic-design.net">Minimalistic Design</a>. Buttons made with <a href="www.mycoolbutton.com">My Cool Button</a>
+		Copyright &copy; 2009. Amit Nithian</div>	
+		
+	</body>
+</html>

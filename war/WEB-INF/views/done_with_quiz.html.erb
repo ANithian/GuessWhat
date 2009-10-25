@@ -1,0 +1,124 @@
+<!--CSS file (default YUI Sam Skin) -->
+<link type="text/css" rel="stylesheet" href="http://yui.yahooapis.com/2.7.0/build/autocomplete/assets/skins/sam/autocomplete.css">
+
+<!-- Dependencies -->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/datasource/datasource-min.js"></script>
+
+<!-- OPTIONAL: Get (required only if using ScriptNodeDataSource) -->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/get/get-min.js"></script>
+
+<!-- OPTIONAL: Connection (required only if using XHRDataSource) -->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/connection/connection-min.js"></script>
+
+<!-- OPTIONAL: Animation (required only if enabling animation) -->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/animation/animation-min.js"></script>
+
+<!-- OPTIONAL: JSON (enables JSON validation) -->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/json/json-min.js"></script>
+
+<!-- Source file -->
+<script type="text/javascript" src="http://yui.yahooapis.com/2.7.0/build/autocomplete/autocomplete-min.js"></script>
+<div style="width:400px;margin-left:auto;margin-right:auto;padding:10px">
+	<% if @fbuid  == 0 %>
+		<h3>Login with Facebook!</h3>
+		<P>
+			Now that you have taken a quiz, the first step is to login via Facebook and share the results with your friends. Only then can you
+			see the answers so you know what you got right and wrong!
+		</P>
+	<%
+	else
+		dThreshold = 0.75
+		if @percentCorrect >= dThreshold
+			sH3Title = "Show off to the world!"
+			sParagraphStart = "You got a great score on this quiz!"
+			#sParagraphEnd = "We will send them a message with your score and a link encouraging them to beat your score on a similar quiz!"
+			sParagraphEnd=""
+		else
+			sH3Title = "Better luck next time"
+			#sParagraphEnd = "We will send them a message with a link encouraging them to also take a similar quiz!"
+			sParagraphEnd=""
+		end
+	%>
+	<h3 style="text-align:center"><%=sH3Title%></h3>
+	<br/>
+	<P><%=sParagraphStart%> By clicking on the "Show Answers" button, your score will be published to Facebook for all to see (and then you can see the answers)! <%=sParagraphEnd%></p>
+	<br/>
+	<form method="POST" action="/guesswhat/show_answers" name="inputFriends">
+		<!-- 
+		<div class="yui-skin-sam" style="width:75%;margin-left:auto;margin-right:auto">
+			<% (1..3).each {|i| %>
+				<div id="myAutoComplete">
+				    <input id="friend<%=i%>" type="text" name="friend<%=i%>">
+				    <input type="hidden" id="friendid<%=i%>" name="friendid<%=i%>"/>
+				    <div id="myContainer<%=i%>"></div>
+				</div>
+				<br/>
+			<%}%>
+			<br/>
+		</div>
+		 -->
+		<center>
+		<!-- <input type="submit" name="show_answers" value="Show Answers!" onClick="return validateInput();"/> -->
+		<input type="submit" name="show_answers" value="Show Answers!"/>
+		<input type="submit" name="quiz_again" value="Take another quiz."/>
+		</center>
+	</form>
+	<script type="text/javascript">
+	/*
+		var dsRemote = new YAHOO.util.XHRDataSource("/guesswhat/fb_friends");
+		dsRemote.responseType = YAHOO.util.XHRDataSource.TYPE_TEXT;
+		// Define the schema of the delimited results
+		dsRemote.responseSchema = {
+		    recordDelim: "|",
+		    fieldDelim: ","
+		};
+		dsRemote.maxCacheEntries = 5;
+
+		//define your itemSelect handler function:
+		var itemSelectHandler = function(sType, aArgs) {
+			YAHOO.log(sType); // this is a string representing the event;
+						      // e.g., "itemSelectEvent"
+			var oMyAcInstance = aArgs[0]; // your AutoComplete instance
+			var elListItem = aArgs[1]; // the <li> element selected in the suggestion
+			   					       // container
+			var oData = aArgs[2]; // object literal of data for the result
+			
+			//Set the hidden field value to the id of the friend selected
+			var oInputField = oMyAcInstance.getInputEl()
+			if(oInputField.id.indexOf("friend") >=0)
+			{
+				var fieldIdx = oInputField.id.substr("friend".length)
+				document.forms['inputFriends'].elements['friendid' + fieldIdx].value=oData[1]
+			}
+			
+		};
+		
+		for(var j=1;j<=3;j++)
+		{
+			var myAutoComp = new YAHOO.widget.AutoComplete("friend"+j,"myContainer"+j, dsRemote);
+			myAutoComp.forceSelection = true;
+			//subscribe your handler to the event, assuming
+			//you have an AutoComplete instance myAC:
+			myAutoComp.itemSelectEvent.subscribe(itemSelectHandler)			
+		}		
+		
+		function validateInput()
+		{
+			var tempIds = new Array()
+			for(var i=1; i<=3;i++)
+			{
+				var newFriendId = document.forms['inputFriends'].elements['friendid' + i].value
+				if(newFriendId.length ==0 || tempIds[newFriendId] != null)
+				{
+					alert('Please enter three different friends.');
+					return false;
+				}
+				tempIds[newFriendId]=newFriendId
+			}
+			return true;
+		}
+		*/
+	</script>	
+	<% end #@fb_user_id  == 0 %>
+</div>

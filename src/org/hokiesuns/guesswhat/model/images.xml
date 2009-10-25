@@ -1,0 +1,28 @@
+<images>
+	<!--  0 based answers -->
+	<image name="/images/quiz/Image1.jpg" answerImage="/images/quiz/Image1.jpg" correctAnswer="2">
+		<answer>Flowers</answer>
+		<answer>Food particles</answer>
+		<answer>Fish kissing</answer>
+	</image>
+	<image name="/images/quiz/Image2.jpg" answerImage="/images/quiz/Image2.jpg" correctAnswer="2">
+		<answer>Stairs</answer>
+		<answer>Bacteria</answer>
+		<answer>Bread</answer>
+	</image>
+	<image name="/images/quiz/Image3.jpg"  answerImage="/images/quiz/Image3.jpg" correctAnswer="1">
+		<answer>Dude with sunglasses</answer>
+		<answer>Sunglasses on a dog’s tail</answer>
+		<answer>Sunglasses on display</answer>
+	</image>
+	<image name="/images/quiz/Image4.jpg" answerImage="/images/quiz/Image4.jpg" correctAnswer="0">
+		<answer>Pasta</answer>
+		<answer>Microbes</answer>
+		<answer>Sea creatures</answer>
+	</image>
+	<image name="/images/quiz/Image5.jpg" answerImage="/images/quiz/Image5.jpg" correctAnswer="1">
+		<answer>Los Angeles</answer>
+		<answer>San Francisco</answer>
+		<answer>Washington, D.C.</answer>
+	</image>				
+</images>

@@ -1,0 +1,34 @@
+<script type="text/javascript">
+		showFeedPrompt();
+		function testCallBack(postId,exception,data)
+		{
+			
+		}		
+		function showFeedPrompt()
+		{
+			template_data = {"number_right":<%=@correctlyGuessed%>,"total_questions":<%=@currentQuiz.size%>}
+			FB.ensureInit(function() {
+			FB.Connect.showFeedDialog(156604416600, template_data, null, null, null,  FB.RequireConnect.promptConnect,testCallBack);
+			});
+			return true;
+		}
+</script>
+
+<div style="text-align:center">
+	<h1 style="margin-bottom: 30px">Answers</h1>
+	<h3>You got <%=@correctlyGuessed%> out of <%=@currentQuiz.size%> correct!</h3>
+	<%
+		0.step(@displayAnswers.size-1,2) { |i|
+		currentQuestion=@displayAnswers[i]
+	%>
+		<div class="showAnswerWrapper">
+			<%=partial :answer,:question=>currentQuestion%>
+			<% if i+1 < @displayAnswers.size %>
+				<%=partial :answer,:question=>@displayAnswers[i+1]%>
+			<%end%>
+		</div>
+	<%
+		}
+	%>
+	<a href="/guesswhat/start_quiz">Take Another Quiz</a>
+</div>

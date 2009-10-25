@@ -1,0 +1,14 @@
+<appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
+  <application>hokiesuns</application>
+  <version>2</version>
+
+  <static-files/>
+
+  <resource-files/>
+
+  <system-properties>
+    <property name="jruby.management.enabled" value="false" />
+    <property name="os.arch" value="" />
+  </system-properties>
+  <sessions-enabled>true</sessions-enabled>
+</appengine-web-app>
