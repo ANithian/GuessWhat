@@ -1,0 +1,17 @@
+TODO:
+* Create a simple Contact Us form to allow people to send an email with suggestions. 
+Use the JavaMail API (JRuby equivalent)
+* Keep statistics for image uploaders to show how good their image is with regards to number of quizzes, number
+guessed correct etc.
+   - Show a count of the number of times the question has appeared
+   - Show a chart of the number of times a given answer was guessed
+   - Maybe show a global rank based on number times guessed correct/number of times presented 
+   - Social aspect? Show how friends have done with this question?
+* Future: Allow an image uploader to customize the answer box with extra text, links or "true" picture link
+to allow for advertising of a product. This would cost the image uploader.
+* Similar to "digg this", a link to "guess this?" 
+
+
+
+
+  

@@ -6,19 +6,14 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import javax.jdo.JDOCanRetryException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -27,53 +22,8 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 
-@PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class Quiz
 {
-    @PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)    
-    private Long id;
-    
-    @Persistent
-    private int correctlyGuessed;
-    @Persistent
-    private List<Long> quizQuestions = new LinkedList<Long>();
-
-//    public static long newQuiz(int pMaxQuizSize)
-//    {
-//        PersistenceManager pm = PMF.get().getPersistenceManager();
-//        Quiz quiz = new Quiz();
-//        long lReturn = 0;
-//        Set<Integer> mQuestionSet = new HashSet<Integer>();
-//        List<SimpleGuessable> mPossibleQuestions;
-//        System.out.println("CREATING NEW QUIZ OF MAX LENGTH " + pMaxQuizSize);
-//        Random r = new Random(System.currentTimeMillis());
-//        int iMaxQuizSize = pMaxQuizSize;
-//        Query q = pm.newQuery(SimpleGuessable.class);
-//        mPossibleQuestions = (List<SimpleGuessable>)q.execute();
-//
-//        if(mPossibleQuestions.size() < iMaxQuizSize)
-//        {
-//            iMaxQuizSize = mPossibleQuestions.size();
-//        }
-//        int iCurrentQuestion = 0;
-//        SimpleGuessable question = null;
-//        while(mQuestionSet.size() < iMaxQuizSize)
-//        {
-//            int i = r.nextInt(mPossibleQuestions.size());
-//            if(!mQuestionSet.contains(i))
-//            {
-//                mQuestionSet.add(i);
-//                question = mPossibleQuestions.get(i);
-//                quiz.addQuestion(question);
-//                iCurrentQuestion++;
-//            }
-//        }
-//        pm.makePersistent(quiz);
-//        lReturn = quiz.id;
-//        return lReturn;
-//    }
-
     public static long[] newQuiz(int pMaxQuizSize)
     {
         PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -107,36 +57,6 @@ public class Quiz
         return lReturn;
     }
     
-    public Long getId()
-    {
-        return id;
-    }
-
-    public int getNumberOfQuestions()
-    {
-        return quizQuestions.size();
-    }
-
-    public int getCorrectlyGuessed()
-    {
-        return correctlyGuessed;
-    }
-    
-    public void addQuestion(SimpleGuessable pQuestion)
-    {
-        quizQuestions.add(pQuestion.getId());
-    }
-    
-    public SimpleGuessable getQuestion(PersistenceManager pStore, int pQuestionNumber)
-    {
-        if(quizQuestions.size() > 0 && pQuestionNumber < quizQuestions.size())
-        {
-            Long lQuestionID = quizQuestions.get(pQuestionNumber);
-            return pStore.getObjectById(SimpleGuessable.class, lQuestionID);
-        }
-        return null;
-    }
-    
     public static List<String[]> getAnswers(long[] pQuizQuestions)
     {
         List<String[]> returnList = new ArrayList<String[]>();
@@ -156,6 +76,27 @@ public class Quiz
             answerAndImage[0]=answers.get(correctAnswer);
             answerAndImage[1]=e.getProperty("answerImageLocation").toString();
             returnList.add(answerAndImage);
+        }
+        return returnList;
+    }
+    
+    public static String[] getUserAnswers(long[] pQuizQuestions, int[] pUserAnswers)
+    {
+        String[] returnList = new String[pUserAnswers.length];
+        DatastoreService service = DatastoreServiceFactory.getDatastoreService();
+        List<Key> lKeys = new ArrayList<Key>();
+        for(long l:pQuizQuestions)
+        {
+            lKeys.add(KeyFactory.createKey(SimpleGuessable.class.getSimpleName(), l));
+        }
+        Map<Key, Entity> results = service.get(lKeys);
+        int i=0;
+        for(Key l:lKeys)
+        {
+            Entity e = results.get(l);
+            List<String> answers = (List<String>)e.getProperty("answers");
+            returnList[i]=answers.get(pUserAnswers[i]);
+            i++;
         }
         return returnList;
     }
@@ -194,5 +135,26 @@ public class Quiz
             e.printStackTrace();
         }
         return returnMap;
+    }
+    
+    public static void updateQuestionStatistics(PersistenceManager pManager, long pQuestion, int pAnswerChoice)
+    {
+        final int NUM_RETRIES=5;
+        for (int i = 0; i < NUM_RETRIES; i++) {
+            pManager.currentTransaction().begin();
+
+            SimpleGuessable question = pManager.getObjectById(SimpleGuessable.class, pQuestion);
+            question.incrementNumberTimesShown();
+            question.incrementAnswerDistribution(pAnswerChoice);
+            try {
+                pManager.currentTransaction().commit();
+                break;
+
+            } catch (JDOCanRetryException ex) {
+                if (i == (NUM_RETRIES - 1)) { 
+                    throw ex;
+                }
+            }
+        }
     }
 }

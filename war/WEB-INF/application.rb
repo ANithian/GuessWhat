@@ -3,6 +3,7 @@ require 'uri'
 require 'appengine-apis/urlfetch'
 #require 'appengine-apis/memcache'
 require 'java'
+require 'json/pure'
 import java.lang.System
 import org.hokiesuns.guesswhat.model.Quiz
 import org.hokiesuns.guesswhat.model.SimpleGuessable
@@ -20,7 +21,7 @@ class Guesswhat < Merb::Controller
   @@FACEBOOK_COOKIE='732394fdee1cd373b6e4898bfb59c16a_session_key'
   before :open_pm, :exclude => [ :get_fbuser,:get_image]
   before :get_fbuser, :exclude => [:get_image]
-  before :getQuiz, :exclude => [ :get_fbuser,:add,:get_image]
+  before :getQuiz, :exclude => [ :index,:contact,:get_fbuser,:add,:get_image,:user_questions,:my_questions,:question_details]
   after :close_pm, :exclude => [ :get_fbuser,:get_image]
   
   def _template_location(action, type = nil, controller = controller_name)
@@ -37,9 +38,9 @@ class Guesswhat < Merb::Controller
       userChoice =params[:choice].to_i
       puts "USER CHOICE=#{userChoice} "
       unless @currentQuestion.nil?
-        puts "#{userChoice == @currentQuestion.getCorrectAnswer} CORRECT = #{@currentQuestion.getCorrectAnswer}"
+        #puts "#{userChoice == @currentQuestion.getCorrectAnswer} CORRECT = #{@currentQuestion.getCorrectAnswer}"
         #Populate the userChoices array if the choice is incorrect. 
-        @userChoices[@currentQuestionNumber] = @currentQuestion.getAnswers().get(userChoice) if userChoice != @currentQuestion.getCorrectAnswer
+        @userChoices[@currentQuestionNumber] = userChoice #@currentQuestion.getAnswers().get(userChoice) if userChoice != @currentQuestion.getCorrectAnswer
         session[:correct_answers] = @userChoices
         @currentQuestionNumber = @currentQuestionNumber+1
         session[:current_question] = @currentQuestionNumber
@@ -71,13 +72,18 @@ class Guesswhat < Merb::Controller
     if @currentQuestionNumber >= @currentQuiz.size
       #For each question, generate a hash containing the answer image location
       #for display, whether it's correct, the user choice and correct choice
-      answers = Quiz.getAnswers(@currentQuiz)      
+      answers = Quiz.getAnswers(@currentQuiz)
+      userAnswers = Quiz.getUserAnswers(@currentQuiz,@userChoices.to_java(:int))
       @displayAnswers = Array.new
       @correctlyGuessed = 0
-      puts "ANSWERS = #{answers}"
       answers.each_with_index {|val,idx| 
-        @displayAnswers << {:is_correct => @userChoices[idx].nil?,:correct_answer => val[0], :answer_image => val[1], :user_answer => @userChoices[idx]}
-        @correctlyGuessed = @correctlyGuessed + 1 if @userChoices[idx].nil?
+        is_correct = userAnswers[idx] == val[0]
+        @displayAnswers << {:correct_answer => val[0], :answer_image => val[1], :user_answer => userAnswers[idx]}
+        @correctlyGuessed = @correctlyGuessed + 1 if is_correct
+      }
+      #Update statistics
+      @currentQuiz.each_with_index {|val,idx|
+        Quiz.updateQuestionStatistics(@pm,val,@userChoices[idx])
       }
       session[:quiz_questions] = nil
       session[:current_question] = nil
@@ -92,15 +98,8 @@ class Guesswhat < Merb::Controller
     if params[:submit] == nil
       render
     else
-      user_address = params[:name]
-      sender_address = "anithian@gmail.com"
-      subject = "GuessWhatItIs Feedback"
-      body = <<EOM
-  Thank you for creating an account!  Please confirm your email address by
-  clicking on the link below:
-EOM
-      AppEngine::Mail.send(sender_address, user_address, subject, body)
-   "Thank You for Sending the Message."
+      AppEngine::Mail.send(params[:emailAddress], "anithian@gmail.com", "GuessWhatItIs Feedback", params[:message])
+      render "<div style=\"margin-left:auto;margin-right:auto;width:75%\"><h2>Thank you for your feedback. We read each message and will do our best to personally respond as quickly as possible</h2>.</div>"
     end
   end
   
@@ -163,6 +162,41 @@ EOM
    send_data imageData, {:disposition=>"inline",:type=>"image/jpg"}   
   end
   
+  def user_questions
+    provides :json
+    content_type :json
+    #100000289421407
+    q = @pm.newQuery("select from #{SimpleGuessable.java_class.name} where creator==#{@fbuid.to_s}")
+    results = q.execute
+    questionData = Array.new
+    results.each { |question|
+      hash={"id"=>question.getId(),"image"=> question.getAnswerImageLocation,"answers"=>question.getAnswers.to_a,"answerDist"=>question.getAnswerDistributions.to_a,"correctAnswer"=>question.getCorrectAnswer}
+      questionData << hash
+    }
+    JSON.generate questionData
+  end
+  
+  def my_questions
+    render
+  end
+
+  def question_details
+    questionId = params[:id]
+    if questionId.nil?
+      redirect "/"
+    else
+      begin
+        @question=@pm.getObjectById(SimpleGuessable.java_class,java::lang::Long.new(questionId))
+        if @question.getCreator != @fbuid
+          redirect "/"
+        else
+          render  
+        end
+      rescue
+        redirect "/"
+      end
+    end
+  end
   private
   
 #  def isLoggedIn

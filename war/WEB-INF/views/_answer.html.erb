@@ -2,7 +2,7 @@
 	 <div style="height:260px">
 	 	<img class="quizImage" src="<%=question[:answer_image]%>"/>
 	 </div>
-	 <%if question[:is_correct] %>
+	 <%if question[:correct_answer] == question[:user_answer] %>
 	 	<h3 style="color:green"><%=question[:correct_answer]%></h3>
 	 <%else%>
 	 	<h3><span style="color:red"><%=question[:user_answer]%>.</span><br/> (Correct answer is <span style="color:green"><%=question[:correct_answer]%></span>)</h3>
