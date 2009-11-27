@@ -26,6 +26,10 @@ public class SimpleGuessable
     private List<String> answers = new ArrayList<String>();
     @Persistent
     private Long creator;
+    @Persistent
+    private int numberTimesShown;
+    @Persistent
+    private List<Integer> answerDistributions = new ArrayList<Integer>();
     
     public Long getId()
     {
@@ -57,6 +61,7 @@ public class SimpleGuessable
     public void addAnswer(String pAnswer)
     {
         answers.add(pAnswer);
+        answerDistributions.add(0);
     }
     public String getAnswerImageLocation()
     {
@@ -74,5 +79,29 @@ public class SimpleGuessable
     public void setCreator(User creator)
     {
         this.creator = creator.getUserID();
+    }
+    public int getNumberTimesShown()
+    {
+        return numberTimesShown;
+    }
+    
+    public void incrementNumberTimesShown()
+    {
+        numberTimesShown++;
+    }
+    
+    public void incrementAnswerDistribution(int pAnswerChoice)
+    {
+        if(pAnswerChoice < answerDistributions.size())
+        {
+            int i = answerDistributions.get(pAnswerChoice);
+            i++;
+            answerDistributions.set(pAnswerChoice, i);
+        }
+    }
+    
+    public List<Integer> getAnswerDistributions()
+    {
+        return answerDistributions;
     }
 }

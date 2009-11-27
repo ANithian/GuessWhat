@@ -27,6 +27,7 @@
 			<fb:profile-pic uid="<%=@fbUser.getId%>" size="square"  facebook-logo="true"></fb:profile-pic>
 			<p>Welcome <%= @fbUser.getName %></p>
 			<a href="#" onclick="FB.Connect.logoutAndRedirect('/'); return false;">Logout</a>
+			<a href="/guesswhat/my_questions" style="padding-left:10px">My Questions</a>
 			<% end %>
 			<script type="text/javascript">  
 				FB.init("732394fdee1cd373b6e4898bfb59c16a", "/xd_receiver.htm");

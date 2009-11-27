@@ -181,9 +181,24 @@ background: #85ACF7 url('images/hidr.jpg');
 	color: #666;
 }
 
-.quizImage
+img.quizImage
 {
 	padding-bottom: 10px;
 	max-width: 320px;
 	max-height:240px;
+}
+
+img.myImage
+{
+	padding-bottom: 10px;
+	max-width: 640px;
+	max-height:480px;
+}
+
+img.thumbNail
+{
+	max-width: 75px;
+	max-height:56px;
+	text-decoration: none;
+	border: 0 none;	
 }

@@ -113,11 +113,24 @@ public class GuessWhatServlet extends HttpServlet
 //            pm.makePersistent(quiz);
 //            System.out.println(quiz);
 //        }
-        else if(action.equals("getQuiz"))
+        else if(action.equals("questionStats"))
         {
-            String id = req.getParameter("quiz_id");
-            Quiz quiz = pm.getObjectById(Quiz.class,Long.parseLong(id));
-            System.out.println(quiz);
+            String id = req.getParameter("user_id");
+            long userId = Long.parseLong(id);
+            Query q = pm.newQuery("select from " + SimpleGuessable.class.getName() + " where creator=="+ userId);
+            List<SimpleGuessable> results = (List<SimpleGuessable>)q.execute();
+            for(SimpleGuessable s:results)
+            {
+                System.out.println("Image: " + s.getAnswerImageLocation() + " has been viewed " + s.getNumberTimesShown() + " times.");
+                System.out.println("Answer Distribution:");
+                List<Integer> answerDist = s.getAnswerDistributions();
+                List<String> answers = s.getAnswers();
+                for(int i=0; i < answers.size(); i++)
+                {
+                    System.out.println(answers.get(i) + " " + answerDist.get(i));
+                }
+                System.out.println("===========================");
+            }
         }
         else if(action.equals("test"))
         {
