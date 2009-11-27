@@ -1,0 +1,47 @@
+		<!-- Individual YUI CSS files -->
+		<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/datatable/assets/skins/sam/datatable.css">
+		<!-- Individual YUI JS files -->
+		<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/yahoo/yahoo-min.js"></script>
+		<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/event/event-min.js"></script>
+		<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/connection/connection-min.js"></script>
+		<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/datasource/datasource-min.js"></script>
+		<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/dom/dom-min.js"></script>
+		<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/element/element-min.js"></script>
+		<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/datatable/datatable-min.js"></script>
+		<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/json/json-min.js"></script>
+		
+			<div id="userQuestionStatistics" class="yui-skin-sam">
+			</div>
+			<script type="text/javascript">
+				// Define a custom format function
+				var imageFormat = function(elCell, oRecord, oColumn, oData) 
+				{
+					questionId = oRecord.getData("id");
+					questionHref = "/guesswhat/question_details/" + questionId
+				    elCell.innerHTML = "<a class=\"image-border\" href=\"" + questionHref + "\"><img class=\"thumbNail\" src=\"" + oData + "\" /></a>";
+				};
+				
+				var correctAnswerFormat = function(e1Cell,oRecord,oColumn,oData)
+				{
+					e1Cell.innerHTML = oRecord.getData("answers")[oData];
+				};
+				var answerFormat = function(e1Cell,oRecord,oColumn,oData)
+				{
+					listHTML = "<ul>";
+					for(var i=0;i < oData.length; i++)
+					{
+						listHTML += ("<li>" + oData[i]);
+					}
+					listHTML += "</ul>";
+					e1Cell.innerHTML = listHTML;
+				};
+				
+				var myColumnDefs = [
+				    {key:"image", label:"Question Image", formatter:imageFormat},
+				    {key:"answers", label:"Answer Choices",formatter:answerFormat},
+				    {key:"correctAnswer", label:"Correct Answer",formatter:correctAnswerFormat}
+				];
+				var dsXHR = new YAHOO.util.XHRDataSource("/guesswhat/user_questions"); 
+				dsXHR.responseType = YAHOO.util.XHRDataSource.TYPE_JSARRAY; 
+				var myDataTable = new YAHOO.widget.DataTable("userQuestionStatistics", myColumnDefs, dsXHR);
+			</script>
