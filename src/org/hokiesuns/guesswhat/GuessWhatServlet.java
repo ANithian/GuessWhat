@@ -64,7 +64,8 @@ public class GuessWhatServlet extends HttpServlet
                 Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
                 XPath xPath = XPathFactory.newInstance().newXPath();
                 NodeList images = (NodeList)xPath.evaluate("/images/image", d,XPathConstants.NODESET);
-                User u = new User(100000289421407l);
+//                User u = new User(100000289421407l);
+                User u = new User(-1l);
                 pm.makePersistent(u);
                 for(int i=0; i < images.getLength(); i++)
                 {
@@ -134,30 +135,30 @@ public class GuessWhatServlet extends HttpServlet
         }
         else if(action.equals("test"))
         {
-            MessageDigest md;
-            try
-            {
-                md = MessageDigest.getInstance("MD5");
-                byte[] md5 = md.digest("Hello World".getBytes());
-//                StringBuffer hexString = new StringBuffer();
-//                for (int i=0;i<md5.length;i++) {
-//                    hexString.append(Integer.toHexString(0xFF & md5[i]));
+//            MessageDigest md;
+//            try
+//            {
+//                md = MessageDigest.getInstance("MD5");
+//                byte[] md5 = md.digest("Hello World".getBytes());
+////                StringBuffer hexString = new StringBuffer();
+////                for (int i=0;i<md5.length;i++) {
+////                    hexString.append(Integer.toHexString(0xFF & md5[i]));
+////                }
+////                System.out.println(hexString.toString());
+//                BigInteger bigInt = new BigInteger(1,md5);
+//                String hashtext = bigInt.toString(16);
+//                // Now we need to zero pad it if you actually want the full 32 chars.
+//                while(hashtext.length() < 32 ){
+//                  hashtext = "0"+hashtext;
 //                }
-//                System.out.println(hexString.toString());
-                BigInteger bigInt = new BigInteger(1,md5);
-                String hashtext = bigInt.toString(16);
-                // Now we need to zero pad it if you actually want the full 32 chars.
-                while(hashtext.length() < 32 ){
-                  hashtext = "0"+hashtext;
-                }
-                System.out.println(hashtext);
-            }
-            catch (NoSuchAlgorithmException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            
+//                System.out.println(hashtext);
+//            }
+//            catch (NoSuchAlgorithmException e)
+//            {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+            Quiz.getNumberImages();
         }
         else if(action.equals("bulkget"))
         {
