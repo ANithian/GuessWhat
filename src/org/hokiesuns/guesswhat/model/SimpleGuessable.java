@@ -31,6 +31,9 @@ public class SimpleGuessable
     @Persistent
     private List<Integer> answerDistributions = new ArrayList<Integer>();
     
+    @Persistent
+    private List<QuestionStatistic> questionStatistics = new ArrayList<QuestionStatistic>();
+    
     public Long getId()
     {
         return id;
@@ -85,18 +88,37 @@ public class SimpleGuessable
         return numberTimesShown;
     }
     
-    public void incrementNumberTimesShown()
+//    public void incrementNumberTimesShown()
+//    {
+//        numberTimesShown++;
+//    }
+//    
+//    public void incrementAnswerDistribution(int pAnswerChoice)
+//    {
+//        if(pAnswerChoice < answerDistributions.size())
+//        {
+//            int i = answerDistributions.get(pAnswerChoice);
+//            i++;
+//            answerDistributions.set(pAnswerChoice, i);
+//        }
+//    }
+    
+    public void updateStatistics(int pAnswerChoice, String pFreeChoice)
     {
         numberTimesShown++;
-    }
-    
-    public void incrementAnswerDistribution(int pAnswerChoice)
-    {
-        if(pAnswerChoice < answerDistributions.size())
+        if (answerDistributions != null && 
+                pAnswerChoice < answerDistributions.size() && 
+                pAnswerChoice >=0)
         {
             int i = answerDistributions.get(pAnswerChoice);
             i++;
             answerDistributions.set(pAnswerChoice, i);
+            questionStatistics.add(new QuestionStatistic(pAnswerChoice));
+        }
+        else
+        {
+            //handle free choice here!
+            questionStatistics.add(new QuestionStatistic(pFreeChoice));
         }
     }
     

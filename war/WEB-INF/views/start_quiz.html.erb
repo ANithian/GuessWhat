@@ -4,12 +4,35 @@
 		<div class="answerBox">
 		<ul>
 			<%
+			if @answerList.size > 0
 			@answerList.each_with_index {|val,idx|
 			%>
 				<li><input type="radio" name="choice" onclick="document.quiz.submit()" value="<%=idx%>"> <%=val%></input></li>
 			<%
 			}
+			else
+			   # This is a free choice answer
 			%>
+				<div style="text-align:center"> 
+					Your Answer: <input type="text" name="free_choice" maxlength=20/> 
+					<br/>
+					<input type="submit" name="submit" value="Submit" onClick="return validateUserChoice();"/>
+					<input type="hidden" name="choice" value="-1"/>				
+				</div> 			
+
+				<script type="text/javascript">
+					function validateUserChoice()
+					{
+						if(document.forms["quiz"].free_choice.value.length == 0)
+						{
+							alert('Please enter your answer to the question.');
+							return false;
+						}
+						return true;
+					}
+					
+				</script>				
+			<% end %>
 		</ul>
 		</div>
 	</form>

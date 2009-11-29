@@ -1,6 +1,4 @@
 TODO:
-* Create a simple Contact Us form to allow people to send an email with suggestions. 
-Use the JavaMail API (JRuby equivalent)
 * Keep statistics for image uploaders to show how good their image is with regards to number of quizzes, number
 guessed correct etc.
    - Show a count of the number of times the question has appeared
@@ -10,6 +8,16 @@ guessed correct etc.
 * Future: Allow an image uploader to customize the answer box with extra text, links or "true" picture link
 to allow for advertising of a product. This would cost the image uploader.
 * Similar to "digg this", a link to "guess this?" 
+
+Free Choice Questions:
+* Extract images from Flickr or other sources
+* Assign a correct answer of -1
+* Have a blank set of answers. As users enter answers, periodically run a cron job
+that will 
+   - Analyze the text
+   - Group and construct a list of answers
+   - Once there is consensus on a correct answer, set the correct answer to one of the choices so that it
+   converts to a multiple choice.
 
 
 

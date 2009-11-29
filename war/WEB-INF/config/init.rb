@@ -6,6 +6,7 @@ use_template_engine :erb
 # Load the apis
 ENV['APPLICATION_ROOT'] = File.join(File.dirname(__FILE__), '..')
 require 'appengine-apis/local_boot'
+require 'set'
 # Specify a specific version of a dependency
 # dependency "RedCloth", "> 3.0"
 
@@ -23,6 +24,12 @@ Merb::BootLoader.after_app_loads do
 #    end
 #  end
   CACHE = AppEngine::Memcache.new
+  
+  #Administrator list. Pages such as my_questions will not only show
+  #questions affiliated with the admin but all users too.
+  ADMINSET = Set.new
+  ADMINSET.add(100000289421407) #Amit Test account
+#  ADMINSET.add(6217743)
 end
 
 # Move this to application.rb if you want it to be reloadable in dev mode.

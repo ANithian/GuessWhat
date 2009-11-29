@@ -21,7 +21,7 @@ class Guesswhat < Merb::Controller
   @@FACEBOOK_COOKIE='732394fdee1cd373b6e4898bfb59c16a_session_key'
   before :open_pm, :exclude => [ :get_fbuser,:get_image]
   before :get_fbuser, :exclude => [:get_image]
-  before :getQuiz, :exclude => [ :index,:contact,:get_fbuser,:add,:get_image,:user_questions,:my_questions,:question_details]
+  #before :getQuiz, :exclude => [ :index,:contact,:get_fbuser,:add,:get_image,:user_questions,:my_questions,:question_details]
   after :close_pm, :exclude => [ :get_fbuser,:get_image]
   
   def _template_location(action, type = nil, controller = controller_name)
@@ -33,15 +33,19 @@ class Guesswhat < Merb::Controller
   end
   
   def start_quiz
+    getQuiz
     #Check a user submission
     unless params[:choice].nil?
-      userChoice =params[:choice].to_i
-      puts "USER CHOICE=#{userChoice} "
+      populateCurrentQuestion
       unless @currentQuestion.nil?
-        #puts "#{userChoice == @currentQuestion.getCorrectAnswer} CORRECT = #{@currentQuestion.getCorrectAnswer}"
-        #Populate the userChoices array if the choice is incorrect. 
+        #Populate the userChoices array if the choice is incorrect.
+        userChoice =  params[:choice].to_i
         @userChoices[@currentQuestionNumber] = userChoice #@currentQuestion.getAnswers().get(userChoice) if userChoice != @currentQuestion.getCorrectAnswer
+        if userChoice < 0
+          @userFreeChoices[@currentQuestionNumber]=params[:free_choice]
+        end
         session[:correct_answers] = @userChoices
+        session[:free_choices] = @userFreeChoices
         @currentQuestionNumber = @currentQuestionNumber+1
         session[:current_question] = @currentQuestionNumber
       end
@@ -49,7 +53,7 @@ class Guesswhat < Merb::Controller
     if @currentQuestionNumber >= @currentQuiz.size
       redirect "/guesswhat/show_answers" 
     else
-      populateQuizInfo
+      populateCurrentQuestion
       render
     end    
   end
@@ -69,7 +73,9 @@ class Guesswhat < Merb::Controller
 #  end
   
   def show_answers
+    getQuiz
     if @currentQuestionNumber >= @currentQuiz.size
+      populateCurrentQuestion
       #For each question, generate a hash containing the answer image location
       #for display, whether it's correct, the user choice and correct choice
       answers = Quiz.getAnswers(@currentQuiz)
@@ -78,16 +84,19 @@ class Guesswhat < Merb::Controller
       @correctlyGuessed = 0
       answers.each_with_index {|val,idx| 
         is_correct = userAnswers[idx] == val[0]
+        val[0] = @userFreeChoices[idx] if val[0]==nil #If the correct answer is null, it means it's a free choice and substitute accordingly
+        userAnswers[idx] = val[0] if userAnswers[idx] == nil
         @displayAnswers << {:correct_answer => val[0], :answer_image => val[1], :user_answer => userAnswers[idx]}
         @correctlyGuessed = @correctlyGuessed + 1 if is_correct
       }
       #Update statistics
       @currentQuiz.each_with_index {|val,idx|
-        Quiz.updateQuestionStatistics(@pm,val,@userChoices[idx])
+        Quiz.updateQuestionStatistics(@pm,val,@userChoices[idx],@userFreeChoices[idx])
       }
       session[:quiz_questions] = nil
       session[:current_question] = nil
-      session[:correct_answers] = nil      
+      session[:correct_answers] = nil
+      session[:free_choices] = nil
       render
     else
       redirect "/"
@@ -166,11 +175,15 @@ class Guesswhat < Merb::Controller
     provides :json
     content_type :json
     #100000289421407
-    q = @pm.newQuery("select from #{SimpleGuessable.java_class.name} where creator==#{@fbuid.to_s}")
+    sWhere = " where creator==#{@fbuid.to_s}"
+    if @adminMode
+      sWhere = " order by creator asc"
+    end
+    q = @pm.newQuery("select from #{SimpleGuessable.java_class.name} #{sWhere}")
     results = q.execute
     questionData = Array.new
     results.each { |question|
-      hash={"id"=>question.getId(),"image"=> question.getAnswerImageLocation,"answers"=>question.getAnswers.to_a,"answerDist"=>question.getAnswerDistributions.to_a,"correctAnswer"=>question.getCorrectAnswer}
+      hash={"id"=>question.getId(),"creator"=>question.getCreator, "image"=> question.getAnswerImageLocation,"answers"=>question.getAnswers.to_a,"answerDist"=>question.getAnswerDistributions.to_a,"correctAnswer"=>question.getCorrectAnswer}
       questionData << hash
     }
     JSON.generate questionData
@@ -187,7 +200,7 @@ class Guesswhat < Merb::Controller
     else
       begin
         @question=@pm.getObjectById(SimpleGuessable.java_class,java::lang::Long.new(questionId))
-        if @question.getCreator != @fbuid
+        if @question.getCreator != @fbuid && !@adminMode
           redirect "/"
         else
           render  
@@ -258,6 +271,8 @@ class Guesswhat < Merb::Controller
       @fbUser = FBUser.new(@fbuid,client)
       CACHE[@fbuid]=@fbUser
     end
+    #Check admin mode
+    @adminMode = ADMINSET.include?(@fbuid)
   end
   
   def getImageData(current_host, image_location)
@@ -273,21 +288,21 @@ class Guesswhat < Merb::Controller
   
   def getQuiz
     quiz_questions = session[:quiz_questions]
-    max_quiz_size = 5
+    max_quiz_size = 2
     if quiz_questions.nil?
       quiz_questions = Quiz.newQuiz(max_quiz_size)
       session[:quiz_questions] = quiz_questions.to_a
       session[:current_question] = 0
       session[:correct_answers] = Array.new(quiz_questions.size)
+      session[:free_choices] = Array.new(quiz_questions.size)
     else
       quiz_questions=quiz_questions.to_java(:long)
     end
     @currentQuiz=quiz_questions
     @currentQuestionNumber = session[:current_question]
-    populateQuizInfo
   end
   
-  def populateQuizInfo
+  def populateCurrentQuestion
     puts "CURRENT QUESTION = #{@currentQuestionNumber}"
 #    @currentQuestion = @currentQuiz.getQuestion(@pm,@currentQuestionNumber)
     if @currentQuestionNumber < @currentQuiz.size
@@ -296,10 +311,11 @@ class Guesswhat < Merb::Controller
         Quiz.getQuestionImageHash(@currentQuiz).each {|key,val| CACHE[key]=val}
         @questionHash = Digest::MD5.hexdigest("question#{@currentQuestion.getId()}")
         @answerList = Array.new
-        @currentQuestion.getAnswers().each {|item| @answerList << item}
+        @currentQuestion.getAnswers().each {|item| @answerList << item} if @currentQuestion.getCorrectAnswer >=0
       end      
     end
     @userChoices = session[:correct_answers]
+    @userFreeChoices=session[:free_choices]
   end
 
   def open_pm

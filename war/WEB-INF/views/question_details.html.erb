@@ -21,9 +21,11 @@
 		        	answerDist = @question.getAnswerDistributions
 		        	answers = @question.getAnswers
 		        	js_answers = "["
-		        	answerDist.each_with_index {|val,idx|
-		        		js_answers << "['#{answers[idx]}',#{val}],"
-		        	}
+		        	unless answers == nil
+			        	answerDist.each_with_index {|val,idx|
+			        		js_answers << "['#{answers[idx]}',#{val}],"
+			        	}
+		        	end
 		        	js_answers << "]"
 		        %>
 		        data.addRows(<%=js_answers%>);
@@ -35,7 +37,11 @@
 		    </script>
 		    
 			<div style="width:400px;float:left;text-align:center">
-			<h1><%=answers[@question.getCorrectAnswer]%></h1>
+			<%
+				sCorrectAnswer = "Free Choice"
+				sCorrectAnswer = answers[@question.getCorrectAnswer] if @question.getCorrectAnswer >=0
+			%>
+			<h1><%=sCorrectAnswer%></h1>
 				<img src="<%=@question.getImageLocation%>" style="max-width:400px;max-height:300px"/>
 			</div>
 		     <!--Div that will hold the pie chart-->

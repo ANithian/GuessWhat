@@ -9,7 +9,9 @@
 		<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/element/element-min.js"></script>
 		<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/datatable/datatable-min.js"></script>
 		<script type="text/javascript" src="http://yui.yahooapis.com/2.8.0r4/build/json/json-min.js"></script>
-		
+		<%if @adminMode %>
+			<h1>Admin View</h1>
+		<% end %>
 			<div id="userQuestionStatistics" class="yui-skin-sam">
 			</div>
 			<script type="text/javascript">
@@ -23,7 +25,12 @@
 				
 				var correctAnswerFormat = function(e1Cell,oRecord,oColumn,oData)
 				{
-					e1Cell.innerHTML = oRecord.getData("answers")[oData];
+					var sCorrectAnswer = "[free choice]";
+					if(oData >= 0)
+					{
+						sCorrectAnswer = oRecord.getData("answers")[oData];
+					}
+					e1Cell.innerHTML = sCorrectAnswer;
 				};
 				var answerFormat = function(e1Cell,oRecord,oColumn,oData)
 				{
@@ -36,8 +43,12 @@
 					e1Cell.innerHTML = listHTML;
 				};
 				
-				var myColumnDefs = [
+				var myColumnDefs = 
+				[
 				    {key:"image", label:"Question Image", formatter:imageFormat},
+				    <%if @adminMode %>
+				    {key:"creator", label:"Creator FBUID"},
+				    <% end %>
 				    {key:"answers", label:"Answer Choices",formatter:answerFormat},
 				    {key:"correctAnswer", label:"Correct Answer",formatter:correctAnswerFormat}
 				];

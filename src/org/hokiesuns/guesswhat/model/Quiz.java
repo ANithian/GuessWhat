@@ -22,6 +22,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 
+
 public class Quiz
 {
     public static long[] newQuiz(int pMaxQuizSize)
@@ -73,7 +74,8 @@ public class Quiz
             String[] answerAndImage = new String[2];
             List<String> answers = (List<String>)e.getProperty("answers");
             int correctAnswer = ((Long)e.getProperty("correctAnswer")).intValue();
-            answerAndImage[0]=answers.get(correctAnswer);
+            if(correctAnswer >=0)
+                answerAndImage[0]=answers.get(correctAnswer);
             answerAndImage[1]=e.getProperty("answerImageLocation").toString();
             returnList.add(answerAndImage);
         }
@@ -95,7 +97,10 @@ public class Quiz
         {
             Entity e = results.get(l);
             List<String> answers = (List<String>)e.getProperty("answers");
-            returnList[i]=answers.get(pUserAnswers[i]);
+            if(pUserAnswers[i] >=0)
+                returnList[i]=answers.get(pUserAnswers[i]);
+            else
+                returnList[i]=null;
             i++;
         }
         return returnList;
@@ -137,15 +142,14 @@ public class Quiz
         return returnMap;
     }
     
-    public static void updateQuestionStatistics(PersistenceManager pManager, long pQuestion, int pAnswerChoice)
+    public static void updateQuestionStatistics(PersistenceManager pManager, long pQuestion, int pAnswerChoice, String pFreeChoice)
     {
         final int NUM_RETRIES=5;
         for (int i = 0; i < NUM_RETRIES; i++) {
             pManager.currentTransaction().begin();
 
             SimpleGuessable question = pManager.getObjectById(SimpleGuessable.class, pQuestion);
-            question.incrementNumberTimesShown();
-            question.incrementAnswerDistribution(pAnswerChoice);
+            question.updateStatistics(pAnswerChoice, pFreeChoice);
             try {
                 pManager.currentTransaction().commit();
                 break;
@@ -156,5 +160,20 @@ public class Quiz
                 }
             }
         }
+    }
+    
+    public static int getNumberImages()
+    {
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        com.google.appengine.api.datastore.Query q = new com.google.appengine.api.datastore.Query("__Stat_Kind__");
+        
+        Entity e = datastore.prepare(q).asSingleEntity();
+//        Iterable<Entity> it = datastore.prepare(new com.google.appengine.api.datastore.Query("__Stat_Kind__")).asIterable();
+//        for(Entity e:it)
+//        {
+//            String s = e.getProperty("kind_name").toString();
+//            System.out.println(s);
+//        }
+        return 10;
     }
 }

@@ -9,6 +9,7 @@
   <system-properties>
     <property name="jruby.management.enabled" value="false" />
     <property name="os.arch" value="" />
+    <property name="jruby.compile.mode" value="OFF"/>
   </system-properties>
   <sessions-enabled>true</sessions-enabled>
 </appengine-web-app>
