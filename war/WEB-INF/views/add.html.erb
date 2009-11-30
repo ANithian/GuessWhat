@@ -20,43 +20,7 @@ elsif params[:submitQuestion].nil?
 	<b>Note:</b> It is your responsibility to make sure that the image links submitted do not violate any copyright laws. Please ensure this before
 	submitting the links!
 	</p> 
-	<table cellspacing="10"> 
-		<tr> 
-		<td> 
-		<div style="width:450px"> 
-			<form name="addQuestion" method="post" action="/guesswhat/add" onSubmit="return validateForm();"> 
-				Question Image Link: <input style="width:100%" name="questionImage" type="text" onFocus = "updateImage('questionImage',true)" onBlur="updateImage('questionImage',true)"/> 
-				<br/> 
-				Answer Image Link: <input style="width:100%" name="answerImage" type="text" onFocus="updateImage('answerImage',false)" onBlur="updateImage('answerImage',false)"/> 
-				<br/><br/> 
-				<p>Enter between three and four possible answers and denote the correct answer.</p> 
-				<input type="text" name="choice0"/> <input type="radio" name="correct" value="0" checked="checked"/> Correct
-				<br/> 
-				<input type="text" name="choice1"/> <input type="radio" name="correct" value="1"/> Correct
-				<br/> 
-				<input type="text" name="choice2"/> <input type="radio" name="correct" value="2"/> Correct
-				<br/> 
-				<input type="text" name="choice3"/> <input type="radio" name="correct" value="3"/> Correct
-				<br/> 
-				<input type="submit" value="Submit Question" id="submitQuestion" name="submitQuestion" disabled="true"/> 
-			</form>
-			</div> 
-			</td> 
-			<td> 
-			<div style="width:240px;height:180px;display:block" id="questionImageDiv"> 
-				<h4 align="center">Question Image</h4> 
-				<img id="questionImage" style="max-width: 240px;max-height: 180px" src="/images/tinyImage.jpg" onLoad="questionImageLoaded()"/> 
-			</div> 
-			</td> 
-			<td> 
-			<div style="width:240px;height:180px;display:block" id="answerImageDiv"> 
-				<h4 align="center">Answer Image</h4> 
-				<img style="max-width: 240px;max-height: 180px" id="answerImage" src="/images/tinyImage.jpg"  onLoad="answerImageLoaded()"/> 
-			</div> 
-			</td> 
-			</tr> 
-			</table> 
-			<script type="text/javascript">
+<script type="text/javascript">
 				var bQuestionImageLoaded=false;
 				var bAnswerImageLoaded=false;
 				
@@ -129,9 +93,45 @@ elsif params[:submitQuestion].nil?
 						alert('A maximum 1MB image file size is allowed to keep the quizzes fast and enjoyable. Please submit links to smaller images.');
 						return false;
 					}
-					return false;
+					return true;
 				}
-			</script> 
+			</script> 	
+	<table cellspacing="10"> 
+		<tr> 
+		<td> 
+		<div style="width:450px"> 
+			<form name="addQuestion" method="post" action="/guesswhat/add" onSubmit="return validateForm();"> 
+				Question Image Link: <input style="width:100%" name="questionImage" type="text" onFocus = "updateImage('questionImage',true)" onBlur="updateImage('questionImage',true)"/> 
+				<br/> 
+				Answer Image Link: <input style="width:100%" name="answerImage" type="text" onFocus="updateImage('answerImage',false)" onBlur="updateImage('answerImage',false)"/> 
+				<br/><br/> 
+				<p>Enter between three and four possible answers and denote the correct answer.</p> 
+				<input type="text" name="choice0"/> <input type="radio" name="correct" value="0" checked="checked"/> Correct
+				<br/> 
+				<input type="text" name="choice1"/> <input type="radio" name="correct" value="1"/> Correct
+				<br/> 
+				<input type="text" name="choice2"/> <input type="radio" name="correct" value="2"/> Correct
+				<br/> 
+				<input type="text" name="choice3"/> <input type="radio" name="correct" value="3"/> Correct
+				<br/> 
+				<input type="submit" value="Submit Question" id="submitQuestion" name="submitQuestion" disabled="true"/> 
+			</form>
+			</div> 
+			</td> 
+			<td> 
+			<div style="width:240px;height:180px;display:block" id="questionImageDiv"> 
+				<h4 align="center">Question Image</h4> 
+				<img id="questionImage" style="max-width: 240px;max-height: 180px" src="/images/tinyImage.jpg" onLoad="questionImageLoaded()"/> 
+			</div> 
+			</td> 
+			<td> 
+			<div style="width:240px;height:180px;display:block" id="answerImageDiv"> 
+				<h4 align="center">Answer Image</h4> 
+				<img style="max-width: 240px;max-height: 180px" id="answerImage" src="/images/tinyImage.jpg"  onLoad="answerImageLoaded()"/> 
+			</div> 
+			</td> 
+			</tr> 
+			</table> 
 <% else %>
 	<h3>Thank You for submitting your question.</h3>
 <%end %>
