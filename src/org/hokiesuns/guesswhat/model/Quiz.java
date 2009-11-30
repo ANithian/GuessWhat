@@ -162,6 +162,49 @@ public class Quiz
         }
     }
     
+    public static void replaceQuestion(PersistenceManager pManager, long[] pQuestions, int pQuestion)
+    {
+        Set<Long> questionSet = new HashSet<Long>();
+        for(long l:pQuestions)
+        {
+            questionSet.add(l);
+        }
+        
+        //First try and update the boring count for the given question.
+        final int NUM_RETRIES=5;
+        for (int i = 0; i < NUM_RETRIES; i++) {
+            pManager.currentTransaction().begin();
+
+            SimpleGuessable question = pManager.getObjectById(SimpleGuessable.class, pQuestions[pQuestion]);
+            question.incrementBoringCount();
+            try {
+                pManager.currentTransaction().commit();
+                break;
+
+            } catch (JDOCanRetryException ex) {
+                if (i == (NUM_RETRIES - 1)) { 
+                    throw ex;
+                }
+            }
+        }
+        //Now come up with a new question
+        Query q = pManager.newQuery(SimpleGuessable.class);
+        Random r = new Random();
+        List<SimpleGuessable> mPossibleQuestions = (List<SimpleGuessable>)q.execute();
+        int iQuestionSize = mPossibleQuestions.size();
+        long iCurrentQuestion = 0;
+        do
+        {
+            int i=r.nextInt(iQuestionSize);
+            SimpleGuessable question = mPossibleQuestions.get(i);
+            iCurrentQuestion=question.getId();
+        }
+        while(questionSet.contains(iCurrentQuestion));
+ 
+        System.out.println("Replacing " + pQuestions[pQuestion] + " with " + iCurrentQuestion);
+        pQuestions[pQuestion] = iCurrentQuestion;
+    }
+    
     public static int getNumberImages()
     {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();

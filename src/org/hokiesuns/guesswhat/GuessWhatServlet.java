@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,6 +51,11 @@ public class GuessWhatServlet extends HttpServlet
         
         String action = req.getParameter("action");
         System.out.println("ACTION = " + action);
+        if(action == null)
+        {
+            resp.getOutputStream().println("Enter an action");
+            return;
+        }
         if(action.equals("imageadmin"))
         {
             InputStream is = this.getClass().getResourceAsStream("/org/hokiesuns/guesswhat/model/images.xml");
@@ -99,6 +105,23 @@ public class GuessWhatServlet extends HttpServlet
             {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+            }
+            finally
+            {
+                pm.close();
+            }
+        }
+        else if(action.equals("deleteImages"))
+        {
+            try
+            {
+                Query q = pm.newQuery(SimpleGuessable.class);
+                Collection<SimpleGuessable> c = (Collection<SimpleGuessable>)q.execute();
+                pm.deletePersistentAll(c);
+            }
+            catch(Exception e)
+            {
+                throw new IOException(e);
             }
             finally
             {

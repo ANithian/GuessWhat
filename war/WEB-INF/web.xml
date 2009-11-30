@@ -7,11 +7,20 @@
   	<servlet-name>GuessWhatTester</servlet-name>
   	<servlet-class>org.hokiesuns.guesswhat.GuessWhatServlet</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>InterestingPicAdder</servlet-name>
+  	<servlet-class>org.hokiesuns.guesswhat.flickr.InterestingPicServlet</servlet-class>
+  </servlet>  
   <servlet-mapping>
   	<servlet-name>GuessWhatTester</servlet-name>
-  	<url-pattern>/test/*</url-pattern>
+  	<url-pattern>/admin/test/*</url-pattern>
   	<load-on-startup>1</load-on-startup>
   </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>InterestingPicAdder</servlet-name>
+  	<url-pattern>/admin/interestingpic/*</url-pattern>
+  	<load-on-startup>1</load-on-startup>
+  </servlet-mapping>  
   <filter>
     <filter-name>RackFilter</filter-name>
     <filter-class>org.jruby.rack.RackFilter</filter-class>
@@ -24,5 +33,13 @@
   <listener>
     <listener-class>org.jruby.rack.merb.MerbServletContextListener</listener-class>
   </listener>
-   
+  
+   <security-constraint>
+    <web-resource-collection>
+        <url-pattern>/admin/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+        <role-name>admin</role-name>
+    </auth-constraint>
+</security-constraint>
 </web-app>

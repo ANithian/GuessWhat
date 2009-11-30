@@ -30,7 +30,8 @@ public class SimpleGuessable
     private int numberTimesShown;
     @Persistent
     private List<Integer> answerDistributions = new ArrayList<Integer>();
-    
+    @Persistent
+    private int badQuestionCount=0;
     @Persistent
     private List<QuestionStatistic> questionStatistics = new ArrayList<QuestionStatistic>();
     
@@ -122,8 +123,18 @@ public class SimpleGuessable
         }
     }
     
+    public void incrementBoringCount()
+    {
+        badQuestionCount++;
+    }
+    
     public List<Integer> getAnswerDistributions()
     {
         return answerDistributions;
+    }
+    
+    public double getDifficulty()
+    {
+        return 1-((badQuestionCount*1.0d)/(1.0d*numberTimesShown));
     }
 }

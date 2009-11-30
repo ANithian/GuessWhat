@@ -35,7 +35,12 @@ class Guesswhat < Merb::Controller
   def start_quiz
     getQuiz
     #Check a user submission
-    unless params[:choice].nil?
+    if !params[:bad_question].nil?
+      #It's possible a question sucks. If so, note it in the question and 
+      #generate a new question.
+      Quiz.replaceQuestion(@pm,@currentQuiz,@currentQuestionNumber)
+      session[:quiz_questions] = @currentQuiz.to_a
+    elsif !params[:choice].nil?
       populateCurrentQuestion
       unless @currentQuestion.nil?
         #Populate the userChoices array if the choice is incorrect.
@@ -288,10 +293,11 @@ class Guesswhat < Merb::Controller
   
   def getQuiz
     quiz_questions = session[:quiz_questions]
-    max_quiz_size = 2
+    max_quiz_size = 5
     if quiz_questions.nil?
       quiz_questions = Quiz.newQuiz(max_quiz_size)
       session[:quiz_questions] = quiz_questions.to_a
+      puts "QUIZ QUESTIONS = #{session[:quiz_questions].join(",")}"
       session[:current_question] = 0
       session[:correct_answers] = Array.new(quiz_questions.size)
       session[:free_choices] = Array.new(quiz_questions.size)
@@ -300,13 +306,21 @@ class Guesswhat < Merb::Controller
     end
     @currentQuiz=quiz_questions
     @currentQuestionNumber = session[:current_question]
+    
   end
   
   def populateCurrentQuestion
     puts "CURRENT QUESTION = #{@currentQuestionNumber}"
 #    @currentQuestion = @currentQuiz.getQuestion(@pm,@currentQuestionNumber)
     if @currentQuestionNumber < @currentQuiz.size
-      @currentQuestion = @pm.getObjectById(SimpleGuessable.java_class,Long.new(@currentQuiz[@currentQuestionNumber]))    
+      begin
+        @currentQuestion = @pm.getObjectById(SimpleGuessable.java_class,Long.new(@currentQuiz[@currentQuestionNumber]))
+      rescue
+        session[:quiz_questions] = nil
+        getQuiz
+        @currentQuestion = @pm.getObjectById(SimpleGuessable.java_class,Long.new(@currentQuiz[@currentQuestionNumber]))
+      end
+    
       unless @currentQuestion.nil?
         Quiz.getQuestionImageHash(@currentQuiz).each {|key,val| CACHE[key]=val}
         @questionHash = Digest::MD5.hexdigest("question#{@currentQuestion.getId()}")

@@ -2,21 +2,26 @@
 	<img class="quizImage" src="/guesswhat/get_image/<%=@questionHash %>"/>
 	<form action="/guesswhat/start_quiz" name="quiz" method="POST">
 		<div class="answerBox">
+			<%
+			if @answerList.size > 0	
+			%>	
 		<ul>
 			<%
-			if @answerList.size > 0
 			@answerList.each_with_index {|val,idx|
 			%>
 				<li><input type="radio" name="choice" onclick="document.quiz.submit()" value="<%=idx%>"> <%=val%></input></li>
 			<%
 			}
+			%>
+		</ul>
+			<%
 			else
 			   # This is a free choice answer
 			%>
 				<div style="text-align:center"> 
 					Your Answer: <input type="text" name="free_choice" maxlength=20/> 
 					<br/>
-					<input type="submit" name="submit" value="Submit" onClick="return validateUserChoice();"/>
+					<input type="submit" name="submitQuiz" value="Submit" onClick="return validateUserChoice();"/>
 					<input type="hidden" name="choice" value="-1"/>				
 				</div> 			
 
@@ -30,10 +35,11 @@
 						}
 						return true;
 					}
-					
 				</script>				
 			<% end %>
-		</ul>
+			<br/>
+			<!--  Report uninteresting question. Will be presented with new question -->
+			<input type="radio" name="bad_question" onClick="document.quiz.submit()" value="bad_question">Not an interesting question? Click for a new one!</input>			
 		</div>
 	</form>
 </div>
