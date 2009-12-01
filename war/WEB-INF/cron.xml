@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
   <cron>
-    <url>/admin/interestingpic/</url>
+    <url>/admin/interestingpic</url>
     <description>Add new Flickr interesting pics to datastore</description>
-    <schedule>every day 04:00</schedule>
+    <schedule>every day 09:00</schedule>
   </cron>
 </cronentries>

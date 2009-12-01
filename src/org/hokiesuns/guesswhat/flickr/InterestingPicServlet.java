@@ -46,19 +46,22 @@ public class InterestingPicServlet extends HttpServlet
     
     private static final String API_KEY = "4b1b63d999f57d3d8bc3510f9b781b6c";
     private static final String SHARED_SECRET = "1989fd52ac3844c4";
-    private PersistenceManager pm = PMF.get().getPersistenceManager();
-    private static final int PICS_TO_ADD=200; //Maximum number of pics to add from Flickr
+//    private PersistenceManager pm = PMF.get().getPersistenceManager();
+    private static final int PICS_TO_ADD=150; //Maximum number of pics to add from Flickr
     
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException
     {
+        
 //        Random r = new Random(System.currentTimeMillis());
         long lStart = System.currentTimeMillis(),lEnd = 0;
         Set<String> extraFields = new HashSet<String>();
         extraFields.add("tags");
+        PersistenceManager pm = null;
         try
         {
+            pm = PMF.get().getPersistenceManager();
             Transport t = new REST();
             InterestingnessInterface iPics = new InterestingnessInterface(API_KEY,SHARED_SECRET,t);
             PhotosInterface photoInt = new PhotosInterface(API_KEY,SHARED_SECRET,t);
@@ -75,7 +78,7 @@ public class InterestingPicServlet extends HttpServlet
                     if(!isPersonPic(p.getTags()))
                     {
 //                        System.out.println(p.getUrl() + ":" + p.getTitle() + " " + p.getMediumUrl());
-                        addPicture(p);
+                        addPicture(p,pm);
                         iPicsAdded++;
                     }
                 }
@@ -86,11 +89,16 @@ public class InterestingPicServlet extends HttpServlet
         {
             throw new ServletException(e);
         }
+        finally
+        {
+            if(pm != null)
+               pm.close();
+        }
         lEnd = System.currentTimeMillis();
         resp.getOutputStream().println("Added " + PICS_TO_ADD + " pictures in " + (lEnd - lStart)/1000 + " seconds");
     }
 
-    private void addPicture(Photo pic)
+    private void addPicture(Photo pic,PersistenceManager pm)
     {
         SimpleGuessable guess = new SimpleGuessable();
         guess.setImageLocation(pic.getMediumUrl());
