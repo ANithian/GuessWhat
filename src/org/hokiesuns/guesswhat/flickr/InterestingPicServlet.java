@@ -47,7 +47,7 @@ public class InterestingPicServlet extends HttpServlet
     private static final String API_KEY = "4b1b63d999f57d3d8bc3510f9b781b6c";
     private static final String SHARED_SECRET = "1989fd52ac3844c4";
     private PersistenceManager pm = PMF.get().getPersistenceManager();
-    private static final int PICS_TO_ADD=100; //Maximum number of pics to add from Flickr
+    private static final int PICS_TO_ADD=200; //Maximum number of pics to add from Flickr
     
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -55,6 +55,8 @@ public class InterestingPicServlet extends HttpServlet
     {
 //        Random r = new Random(System.currentTimeMillis());
         long lStart = System.currentTimeMillis(),lEnd = 0;
+        Set<String> extraFields = new HashSet<String>();
+        extraFields.add("tags");
         try
         {
             Transport t = new REST();
@@ -62,13 +64,14 @@ public class InterestingPicServlet extends HttpServlet
             PhotosInterface photoInt = new PhotosInterface(API_KEY,SHARED_SECRET,t);
             int iPicsAdded = 0;
             int iPage = 1;
+            
             while(iPicsAdded < PICS_TO_ADD)
             {
-                PhotoList pList = iPics.getList(getYesterday(),null,200,iPage);
-                for(int i=0; i < pList.size(); i++)
+                PhotoList pList = iPics.getList(getYesterday(),extraFields,200,iPage);
+                for(int i=0; i < pList.size() && i < PICS_TO_ADD; i++)
                 {
                     Photo p = (Photo)pList.get(i);
-                    p = photoInt.getInfo(p.getId(), p.getSecret());
+//                    p = photoInt.getInfo(p.getId(), p.getSecret());
                     if(!isPersonPic(p.getTags()))
                     {
 //                        System.out.println(p.getUrl() + ":" + p.getTitle() + " " + p.getMediumUrl());
