@@ -19,10 +19,10 @@ import java.lang.Long
 require 'appengine-apis/mail'
 class Guesswhat < Merb::Controller
   @@FACEBOOK_COOKIE='732394fdee1cd373b6e4898bfb59c16a_session_key'
-  before :open_pm, :exclude => [ :get_fbuser,:get_image]
+  before :open_pm, :exclude => [ :index, :get_fbuser,:get_image]
   before :get_fbuser, :exclude => [:get_image]
   #before :getQuiz, :exclude => [ :index,:contact,:get_fbuser,:add,:get_image,:user_questions,:my_questions,:question_details]
-  after :close_pm, :exclude => [ :get_fbuser,:get_image]
+  after :close_pm, :exclude => [ :index, :get_fbuser,:get_image]
   
   def _template_location(action, type = nil, controller = controller_name)
     controller == "layout" ? "layout.#{action}.#{type}" : "#{action}.#{type}"
@@ -112,7 +112,7 @@ class Guesswhat < Merb::Controller
     if params[:submit] == nil
       render
     else
-      AppEngine::Mail.send(params[:emailAddress], "anithian@gmail.com", "GuessWhatItIs Feedback", params[:message])
+      AppEngine::Mail.send("anithian@gmail.com", "anithian@gmail.com", "GuessWhatItIs Feedback from #{params[:emailAddress]}", params[:message])
       render "<div style=\"margin-left:auto;margin-right:auto;width:75%\"><h2>Thank you for your feedback. We read each message and will do our best to personally respond as quickly as possible</h2>.</div>"
     end
   end
