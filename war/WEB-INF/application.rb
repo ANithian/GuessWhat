@@ -287,13 +287,14 @@ class Guesswhat < Merb::Controller
     image_to_dl = image_location
     uri = URI.parse(image_location)
     image_to_dl = "http://#{request.host}/#{image_location}" if uri.scheme != "http"
+    puts "Getting image #{image_to_dl}"
     res=AppEngine::URLFetch.fetch(image_to_dl)
     res.body
   end
   
   def getQuiz
     quiz_questions = session[:quiz_questions]
-    max_quiz_size = 5
+    max_quiz_size = 6
     if quiz_questions.nil?
       quiz_questions = Quiz.newQuiz(max_quiz_size)
       session[:quiz_questions] = quiz_questions.to_a
