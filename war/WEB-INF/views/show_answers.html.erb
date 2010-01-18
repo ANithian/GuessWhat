@@ -6,9 +6,9 @@
 		}		
 		function showFeedPrompt()
 		{
-			template_data = {"number_right":<%=@correctlyGuessed%>,"total_questions":<%=@currentQuiz.size%>}
+			var myAttach = {'name':'Try and beat my score!','caption':' {*actor*} correctly guessed 5 images on GuessWhatItIs.com!','href':'http://www.guesswhatitis.com/'};
 			FB.ensureInit(function() {
-			FB.Connect.showFeedDialog(156604416600, template_data, null, null, null,  FB.RequireConnect.promptConnect,testCallBack);
+			FB.Connect.streamPublish('', myAttach);
 			});
 			return true;
 		}
