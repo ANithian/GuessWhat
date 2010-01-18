@@ -47,7 +47,7 @@ public class InterestingPicServlet extends HttpServlet
     private static final String API_KEY = "4b1b63d999f57d3d8bc3510f9b781b6c";
     private static final String SHARED_SECRET = "1989fd52ac3844c4";
 //    private PersistenceManager pm = PMF.get().getPersistenceManager();
-    private static final int PICS_TO_ADD=150; //Maximum number of pics to add from Flickr
+    private static final int PICS_TO_ADD=25; //Maximum number of pics to add from Flickr
     
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
